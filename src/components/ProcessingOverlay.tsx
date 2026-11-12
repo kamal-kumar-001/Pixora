@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Loader2, Sparkles, ScanText } from 'lucide-react';
 import { ProcessingProgress } from '../types/editor';
 
 interface ProcessingOverlayProps {
@@ -10,39 +10,38 @@ export const ProcessingOverlay: React.FC<ProcessingOverlayProps> = ({ progress }
   if (progress.status === 'idle' || progress.status === 'ready') return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-studio-950/80 backdrop-blur-md">
-      <div className="w-full max-w-md p-6 mx-4 rounded-2xl bg-studio-900 border border-studio-700 shadow-2xl flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-cream-100/80 backdrop-blur-md">
+      <div className="w-full max-w-md p-7 mx-4 rounded-3xl bg-cream-50 border border-cream-200 shadow-[0_30px_80px_-30px_rgba(84,34,74,0.45)] flex flex-col items-center text-center animate-in fade-in zoom-in-95 duration-200">
         <div className="relative mb-5 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500">
-            <Sparkles className="w-8 h-8 animate-pulse text-indigo-400" />
+          <div className="w-16 h-16 rounded-full bg-peach-300/40 border border-peach-400/60 flex items-center justify-center">
+            <Sparkles className="w-8 h-8 animate-pulse text-plum-800" />
           </div>
-          <Loader2 className="w-20 h-20 text-brand-500 animate-spin absolute -inset-2 opacity-60" />
+          <Loader2 className="w-20 h-20 text-peach-500 animate-spin absolute -inset-2 opacity-70" />
         </div>
 
-        <h3 className="text-xl font-semibold text-white tracking-tight mb-2">
-          Pixora AI Processing
+        <h3 className="font-display text-2xl font-semibold text-plum-900 tracking-tight mb-2">
+          Pixora is reading your image
         </h3>
-        
-        <p className="text-sm text-slate-300 min-h-[40px] mb-4">
+
+        <p className="text-sm text-plum-600 min-h-[40px] mb-4">
           {progress.message}
         </p>
 
-        {/* Progress bar */}
-        <div className="w-full bg-studio-800 rounded-full h-2 mb-2 overflow-hidden border border-studio-700">
+        <div className="w-full bg-cream-200 rounded-full h-2 mb-2 overflow-hidden border border-cream-200">
           <div
-            className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-300 ease-out"
+            className="bg-gradient-to-r from-peach-400 to-plum-800 h-full rounded-full transition-all duration-300 ease-out"
             style={{ width: `${Math.max(5, progress.progress)}%` }}
           />
         </div>
 
-        <div className="flex items-center justify-between w-full text-xs text-slate-400 px-1">
-          <span>OCR & Style Extraction</span>
+        <div className="flex items-center justify-between w-full text-xs text-plum-600 px-1">
+          <span>Detecting text and styles</span>
           <span className="font-mono">{progress.progress}%</span>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-studio-800 flex items-center gap-2 text-xs text-slate-400">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Local browser inference & zero data leaves your machine</span>
+        <div className="mt-4 pt-4 border-t border-cream-200 w-full flex items-center justify-center gap-2 text-xs text-plum-600">
+          <ScanText className="w-4 h-4 text-peach-500 shrink-0" />
+          <span>Text boxes become editable layers once detection finishes</span>
         </div>
       </div>
     </div>

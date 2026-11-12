@@ -37,16 +37,16 @@ export const PixoraLogo: React.FC<PixoraLogoProps> = ({
         >
           <defs>
             <linearGradient id="pixora-grad" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#4F46E5" />
-              <stop offset="45%" stopColor="#6366F1" />
-              <stop offset="100%" stopColor="#8B5CF6" />
+              <stop offset="0%" stopColor="#54224A" />
+              <stop offset="45%" stopColor="#7D4472" />
+              <stop offset="100%" stopColor="#A77A9D" />
             </linearGradient>
             <linearGradient id="pixora-accent" x1="14" y1="6" x2="34" y2="26" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stopColor="#38BDF8" />
-              <stop offset="100%" stopColor="#818CF8" />
+              <stop offset="0%" stopColor="#F9C3A8" />
+              <stop offset="100%" stopColor="#EA8A68" />
             </linearGradient>
             <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="120%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#4F46E5" floodOpacity="0.18" />
+              <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#54224A" floodOpacity="0.18" />
             </filter>
           </defs>
 
@@ -57,8 +57,8 @@ export const PixoraLogo: React.FC<PixoraLogoProps> = ({
             width="38" 
             height="38" 
             rx="11" 
-            fill={isLight ? '#FFFFFF' : '#0F172A'} 
-            stroke={isLight ? '#E2E8F0' : '#1E293B'} 
+            fill={isLight ? '#FFFAF5' : '#2A0E22'} 
+            stroke={isLight ? '#F1DCCB' : '#54224A'} 
             strokeWidth="1.5" 
             filter="url(#soft-shadow)"
           />
@@ -70,7 +70,7 @@ export const PixoraLogo: React.FC<PixoraLogoProps> = ({
           />
 
           {/* Inner Negative Space Loop */}
-          <circle cx="21" cy="18" r="4" fill={isLight ? '#FFFFFF' : '#0F172A'} />
+          <circle cx="21" cy="18" r="4" fill={isLight ? '#FFFAF5' : '#2A0E22'} />
 
           {/* Precision AI Text Reticle Node */}
           <circle cx="28" cy="12" r="2.2" fill="url(#pixora-accent)" />
@@ -93,7 +93,7 @@ export const PixoraLogo: React.FC<PixoraLogoProps> = ({
           <span className={`text-[10px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full border ${
             isLight 
               ? 'bg-indigo-50/80 text-indigo-700 border-indigo-200/60' 
-              : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
+              : 'bg-indigo-500/10 text-peach-300 border-indigo-500/30'
           }`}>
             AI
           </span>
