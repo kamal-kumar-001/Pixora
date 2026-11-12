@@ -10,7 +10,7 @@ import { patchTextBlockOnCanvas } from './inpainter';
 export async function exportEditedImage(
   backgroundImg: HTMLImageElement,
   textBlocks: TextBlock[],
-  fileName: string = 'typeshift-edited-image.png'
+  fileName: string = 'pixora-edited-image.png'
 ): Promise<void> {
   // Ensure all fonts used by blocks are loaded in document
   const uniqueFonts = Array.from(new Set(textBlocks.map(b => b.fontFamily)));
@@ -25,29 +25,27 @@ export async function exportEditedImage(
   // 1. Draw 100% pristine original base image
   ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
 
-  // 2. Only modify blocks that the user actually changed or deleted
+  // 2. Only modify blocks that were actually changed or deleted
   for (const block of textBlocks) {
-    if (block.isDeleted) {
-      // User requested removing this text
-      patchTextBlockOnCanvas(ctx, block);
-      continue;
-    }
+    const isChanged = block.isModified || block.text !== block.originalText || block.isDeleted;
 
-    if (!block.isModified) {
+    if (!isChanged) {
       // Untouched by user: preserve 100% original pixels!
       continue;
     }
 
-    // Block was modified: cleanly patch the background area first
+    // Always patch the original text bounding box first
     patchTextBlockOnCanvas(ctx, block);
 
-    if (!block.text.trim()) continue;
+    if (block.isDeleted || !block.text.trim()) {
+      continue;
+    }
 
     ctx.save();
     ctx.globalAlpha = block.opacity;
 
-    // Build font string
-    ctx.font = `${block.fontStyle} ${block.fontWeight} ${block.fontSize}px "${block.fontFamily}", sans-serif`;
+    // Use robust font stack so special unicode characters (like ₹) always render cleanly
+    ctx.font = `${block.fontStyle} ${block.fontWeight} ${block.fontSize}px "${block.fontFamily}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
     ctx.fillStyle = block.color;
     ctx.textBaseline = 'top';
 

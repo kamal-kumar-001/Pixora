@@ -6,6 +6,13 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Manrope', 'system-ui', 'sans-serif'],
+        mono: ['Geist Mono', 'monospace'],
+      },
+      transitionTimingFunction: {
+        'landing': 'cubic-bezier(0.22, 1, 0.36, 1)',
+      },
       colors: {
         studio: {
           950: '#090a0f',

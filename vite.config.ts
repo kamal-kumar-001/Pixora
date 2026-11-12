@@ -1,10 +1,26 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 3000,
-    open: true
-  }
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const apiKey = env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY || '';
+
+  return {
+    plugins: [react()],
+    define: {
+      'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(apiKey),
+      'import.meta.env.GEMINI_API_KEY': JSON.stringify(apiKey)
+    },
+    server: {
+      port: 3000,
+      open: true,
+      proxy: {
+        '/api/gemini': {
+          target: 'https://generativelanguage.googleapis.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/gemini/, '')
+        }
+      }
+    }
+  };
 });

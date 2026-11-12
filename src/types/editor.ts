@@ -13,12 +13,19 @@ export interface TextBlock {
   y: number;
   width: number;
   height: number;
+  originalX: number;
+  originalY: number;
+  originalWidth: number;
+  originalHeight: number;
   fontSize: number;
   fontFamily: string;
   fontWeight: '400' | '500' | '600' | '700' | '800';
   fontStyle: 'normal' | 'italic';
   color: string;
   backgroundColor: string;
+  patchPaddingX: number; // in px
+  patchPaddingY: number; // in px
+  showBackgroundPatch: boolean;
   textAlign: 'left' | 'center' | 'right';
   letterSpacing: number; // in px
   lineHeight: number; // multiplier e.g. 1.2

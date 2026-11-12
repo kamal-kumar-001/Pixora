@@ -1,24 +1,126 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Header } from './components/Header';
 import { CanvasArea } from './components/CanvasArea';
 import { StylePanel } from './components/StylePanel';
 import { ProcessingOverlay } from './components/ProcessingOverlay';
+import { LandingHero } from './components/LandingHero';
 import { TextBlock, EditorImageState, ProcessingProgress } from './types/editor';
+import { detectTextWithGemini, applyAiRewritePrompt } from './engine/geminiAi';
 import { runOcrAndExtractStyles } from './engine/ocr';
 import { exportEditedImage } from './engine/exporter';
 import { ensureFontLoaded } from './engine/fonts';
 import { SampleImage } from './engine/sampleImages';
 
 export const App: React.FC = () => {
+  const [route, setRoute] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const p = window.location.pathname;
+      if (p === '/edit' || window.location.hash === '#edit') return '/edit';
+    }
+    return '/';
+  });
+
   const [imageState, setImageState] = useState<EditorImageState | null>(null);
   const [textBlocks, setTextBlocks] = useState<TextBlock[]>([]);
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [zoom, setZoom] = useState<number>(1);
+  const [isAiProcessing, setIsAiProcessing] = useState<boolean>(false);
   const [progress, setProgress] = useState<ProcessingProgress>({
     status: 'idle',
     progress: 0,
     message: '',
   });
+
+  // Undo / Redo History Stack
+  const historyRef = useRef<TextBlock[][]>([]);
+  const historyIndexRef = useRef<number>(-1);
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+
+  const updateHistoryState = () => {
+    setCanUndo(historyIndexRef.current > 0);
+    setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+  };
+
+  const pushHistorySnapshot = useCallback((newBlocks: TextBlock[]) => {
+    // Truncate future history if branched
+    const nextHistory = historyRef.current.slice(0, historyIndexRef.current + 1);
+    nextHistory.push(JSON.parse(JSON.stringify(newBlocks)));
+    // Keep max 40 steps
+    if (nextHistory.length > 40) {
+      nextHistory.shift();
+    }
+    historyRef.current = nextHistory;
+    historyIndexRef.current = nextHistory.length - 1;
+    updateHistoryState();
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    if (historyIndexRef.current > 0) {
+      historyIndexRef.current -= 1;
+      const snapshot = historyRef.current[historyIndexRef.current];
+      setTextBlocks(JSON.parse(JSON.stringify(snapshot)));
+      updateHistoryState();
+    }
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      historyIndexRef.current += 1;
+      const snapshot = historyRef.current[historyIndexRef.current];
+      setTextBlocks(JSON.parse(JSON.stringify(snapshot)));
+      updateHistoryState();
+    }
+  }, []);
+
+  // Global Keyboard shortcuts for Undo and Redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in input or textarea
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const cmdKey = isMac ? e.metaKey : e.ctrlKey;
+
+      if (cmdKey && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+      } else if (!isMac && cmdKey && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const p = window.location.pathname;
+      if (p === '/edit' || window.location.hash === '#edit') {
+        setRoute('/edit');
+      } else {
+        setRoute('/');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (path: string) => {
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', path);
+    }
+    setRoute(path);
+  };
 
   // Process an image source (from File or DataURL)
   const processImageSource = async (src: string, fileName: string) => {
@@ -50,8 +152,15 @@ export const App: React.FC = () => {
       const scaleFit = Math.min(1, Math.min(maxW / canvas.width, maxH / canvas.height));
       setZoom(Math.max(0.4, Number(scaleFit.toFixed(2))));
 
-      // 1. Run OCR and Style Extraction
-      const detectedBlocks = await runOcrAndExtractStyles(canvas, setProgress);
+      let detectedBlocks: TextBlock[] = [];
+
+      // 1. Try Gemini Vision AI first for highest precision
+      try {
+        detectedBlocks = await detectTextWithGemini(canvas, setProgress);
+      } catch (geminiError) {
+        console.warn('Gemini Vision API fallback to local OCR:', geminiError);
+        detectedBlocks = await runOcrAndExtractStyles(canvas, setProgress);
+      }
 
       // Preload detected fonts
       for (const b of detectedBlocks) {
@@ -68,8 +177,14 @@ export const App: React.FC = () => {
       });
 
       setTextBlocks(detectedBlocks);
-      // Keep selectedBlockId null initially so the user views the pristine image!
       setSelectedBlockId(null);
+
+      // Initialize history stack with initial state
+      historyRef.current = [JSON.parse(JSON.stringify(detectedBlocks))];
+      historyIndexRef.current = 0;
+      updateHistoryState();
+
+      navigateTo('/edit');
 
       setProgress({
         status: 'ready',
@@ -109,17 +224,24 @@ export const App: React.FC = () => {
     const newBlock: TextBlock = {
       id: `text-block-${Date.now()}`,
       text: 'New Headline',
-      originalText: 'New Headline',
+      originalText: '',
       x: Math.round(imageState.width / 2 - 120),
       y: Math.round(imageState.height / 2 - 30),
       width: 240,
       height: 60,
+      originalX: Math.round(imageState.width / 2 - 120),
+      originalY: Math.round(imageState.height / 2 - 30),
+      originalWidth: 240,
+      originalHeight: 60,
+      patchPaddingX: 6,
+      patchPaddingY: 4,
+      showBackgroundPatch: true,
       fontSize: 36,
-      fontFamily: 'Inter',
+      fontFamily: 'Manrope',
       fontWeight: '700',
       fontStyle: 'normal',
-      color: '#ffffff',
-      backgroundColor: '#12141c',
+      color: '#0F172A',
+      backgroundColor: '#FFFFFF',
       textAlign: 'center',
       letterSpacing: 0,
       lineHeight: 1.2,
@@ -129,16 +251,30 @@ export const App: React.FC = () => {
       isDeleted: false,
     };
 
-    setTextBlocks(prev => [...prev, newBlock]);
+    setTextBlocks(prev => {
+      const updated = [...prev, newBlock];
+      pushHistorySnapshot(updated);
+      return updated;
+    });
     setSelectedBlockId(newBlock.id);
   };
 
   const handleUpdateBlock = (updated: TextBlock) => {
-    setTextBlocks(prev => prev.map(b => b.id === updated.id ? updated : b));
+    const isNowModified = updated.isModified || updated.text !== updated.originalText;
+    const finalBlock = { ...updated, isModified: isNowModified };
+    setTextBlocks(prev => {
+      const next = prev.map(b => b.id === updated.id ? finalBlock : b);
+      pushHistorySnapshot(next);
+      return next;
+    });
   };
 
   const handleDeleteBlock = (id: string) => {
-    setTextBlocks(prev => prev.map(b => b.id === id ? { ...b, isDeleted: true, isModified: true } : b));
+    setTextBlocks(prev => {
+      const next = prev.map(b => b.id === id ? { ...b, isDeleted: true, isModified: true } : b);
+      pushHistorySnapshot(next);
+      return next;
+    });
     if (selectedBlockId === id) {
       setSelectedBlockId(null);
     }
@@ -156,8 +292,27 @@ export const App: React.FC = () => {
       isModified: true,
     };
 
-    setTextBlocks(prev => [...prev, duplicated]);
+    setTextBlocks(prev => {
+      const next = [...prev, duplicated];
+      pushHistorySnapshot(next);
+      return next;
+    });
     setSelectedBlockId(duplicated.id);
+  };
+
+  const handleAiPrompt = async (instruction: string) => {
+    if (!textBlocks.length) return;
+    setIsAiProcessing(true);
+    try {
+      const updated = await applyAiRewritePrompt(instruction, textBlocks);
+      setTextBlocks(updated);
+      pushHistorySnapshot(updated);
+    } catch (e) {
+      console.error('AI rewrite error:', e);
+      alert('AI rewrite encountered an issue. You can edit text directly on the image.');
+    } finally {
+      setIsAiProcessing(false);
+    }
   };
 
   const handleExport = () => {
@@ -172,13 +327,22 @@ export const App: React.FC = () => {
 
   const selectedBlock = textBlocks.find(b => b.id === selectedBlockId && !b.isDeleted) || null;
 
+  if (route !== '/edit') {
+    return <LandingHero onNavigateToEditor={() => navigateTo('/edit')} />;
+  }
+
   return (
-    <div className="flex flex-col w-screen h-screen overflow-hidden bg-studio-950 font-sans">
+    <div className="flex flex-col w-screen h-screen overflow-hidden bg-slate-50 font-sans">
       <Header
         onImageSelected={handleImageFile}
         onSampleSelected={handleSampleSelected}
         onExport={handleExport}
         onAddText={handleAddText}
+        onNavigateToLanding={() => navigateTo('/')}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        canUndo={canUndo}
+        canRedo={canRedo}
         zoom={zoom}
         onZoomChange={setZoom}
         hasImage={!!imageState}
@@ -205,6 +369,8 @@ export const App: React.FC = () => {
             onSelectBlock={setSelectedBlockId}
             onDeleteBlock={handleDeleteBlock}
             onDuplicateBlock={handleDuplicateBlock}
+            onAiPrompt={handleAiPrompt}
+            isAiProcessing={isAiProcessing}
           />
         )}
       </div>

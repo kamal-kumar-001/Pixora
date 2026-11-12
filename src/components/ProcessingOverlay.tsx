@@ -20,7 +20,7 @@ export const ProcessingOverlay: React.FC<ProcessingOverlayProps> = ({ progress }
         </div>
 
         <h3 className="text-xl font-semibold text-white tracking-tight mb-2">
-          TypeShift AI Processing
+          Pixora AI Processing
         </h3>
         
         <p className="text-sm text-slate-300 min-h-[40px] mb-4">

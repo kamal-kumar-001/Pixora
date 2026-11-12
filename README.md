@@ -1,17 +1,18 @@
-# TypeShift AI — In-Place Image Text Editor
+# Pixora — Next-Gen AI In-Place Image Text Editor
 
-> **TypeShift AI** is a browser-native studio for direct in-place image text editing. Upload any screenshot, receipt, banner, or artwork, and edit text directly on the image with matched fonts, colors, and styling while preserving 100% of the image's original resolution, logos, and graphics.
+> **Pixora** is a high-performance studio for direct in-place image text editing with zero quality loss. Powered by Google Gemini Vision AI and precision canvas compositing, Pixora detects typography, colors, and spatial bounding boxes to replace text directly in place without blurring backgrounds or destroying logos.
 
 ---
 
 ## ✨ Key Features
 
 - **Pristine Non-Destructive Base Layer**: Original image quality, logos (UPI, bank badges, icons, checkmarks), and backgrounds are 100% preserved.
-- **Client-Side OCR**: Powered by `Tesseract.js` for fast, private, on-device text and layout detection.
+- **Multimodal Vision Intelligence**: Powered by Google Gemini 3.1 Flash Vision AI with Tesseract.js local fallback.
 - **Pixel-Level Style Analyzer**: Automatically extracts exact foreground text colors, local card background tones, font sizes, and weights.
-- **Targeted Non-Destructive Inpainting**: Only patches the specific bounding box of text that you edit or delete; untouched regions remain pixel-perfect.
-- **Live Typography Controls**: Real-time font family selection (Google Fonts preloaded: Inter, Roboto, Montserrat, Poppins, etc.), size, weight, letter spacing, alignment, and color picker.
+- **Targeted Non-Destructive Inpainting**: Only patches the union bounding box of modified text blocks with customizable background color, padding, and positioning.
+- **Live Typography Controls**: Real-time font family selection (Manrope, Inter, Roboto, Montserrat, Poppins, etc.), size, weight, letter spacing, alignment, and color picker with EyeDropper API.
 - **Full-Resolution Export**: Seamlessly merges original graphics with edited typography into a high-res PNG download.
+- **Modern Landing Page**: Premium light-theme landing page with 3D interactive hero, designed for UI/UX excellence.
 
 ---
 
@@ -19,8 +20,8 @@
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/<your-username>/typeshift-ai.git
-cd typeshift-ai
+git clone https://github.com/<your-username>/pixora.git
+cd pixora
 npm install
 ```
 

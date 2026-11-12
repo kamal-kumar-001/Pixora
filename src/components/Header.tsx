@@ -6,15 +6,24 @@ import {
   ZoomOut, 
   Plus, 
   Image as ImageIcon,
-  ScanText
+  ScanText,
+  Undo2,
+  Redo2,
+  ArrowLeft
 } from 'lucide-react';
 import { SAMPLE_IMAGES, SampleImage } from '../engine/sampleImages';
+import { PixoraLogo } from './PixoraLogo';
 
 interface HeaderProps {
   onImageSelected: (file: File) => void;
   onSampleSelected: (sample: SampleImage) => void;
   onExport: () => void;
   onAddText: () => void;
+  onNavigateToLanding: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
   zoom: number;
   onZoomChange: (newZoom: number) => void;
   hasImage: boolean;
@@ -26,6 +35,11 @@ export const Header: React.FC<HeaderProps> = ({
   onSampleSelected,
   onExport,
   onAddText,
+  onNavigateToLanding,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
   zoom,
   onZoomChange,
   hasImage,
@@ -41,62 +55,86 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-14 bg-studio-900 border-b border-studio-800 px-4 flex items-center justify-between z-30 select-none">
-      {/* Brand logo & title */}
+    <header className="h-14 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 flex items-center justify-between z-30 select-none shadow-xs">
+      {/* Brand logo & back button */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-black text-sm shadow-md shadow-indigo-500/20">
-          T
-        </div>
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-bold tracking-tight text-white flex items-center gap-1.5">
-              TypeShift <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">AI Studio</span>
-            </h1>
-          </div>
-        </div>
+        <PixoraLogo size="sm" variant="light" showBadge={true} />
+        <button
+          onClick={onNavigateToLanding}
+          className="text-xs text-slate-500 hover:text-slate-900 transition ml-2 border-l border-slate-200 pl-3 flex items-center gap-1 font-medium"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Landing</span>
+        </button>
       </div>
 
-      {/* Center Controls: Add Text, Detected Count, Zoom */}
+      {/* Center Controls: Add Text, Undo/Redo, Detected Count, Zoom */}
       <div className="flex items-center gap-2">
         {hasImage && (
           <>
             {/* Add text block */}
             <button
               onClick={onAddText}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-studio-800 hover:bg-studio-700 text-xs font-medium text-slate-200 border border-studio-700 transition active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100/80 text-xs font-semibold text-indigo-700 border border-indigo-200/70 transition active:scale-95 shadow-2xs"
               title="Add a new text block"
             >
-              <Plus className="w-3.5 h-3.5 text-indigo-400" />
+              <Plus className="w-3.5 h-3.5 text-indigo-600" />
               <span>Add Text</span>
             </button>
 
-            {/* Detected badge */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-studio-850 border border-studio-700/60 text-xs text-slate-300">
-              <ScanText className="w-3.5 h-3.5 text-indigo-400" />
-              <span>{blockCount} text layers detected</span>
+            {/* Undo / Redo Controls */}
+            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-0.5 text-slate-700">
+              <button
+                onClick={onUndo}
+                disabled={!canUndo}
+                className="p-1.5 hover:text-slate-900 hover:bg-white rounded disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-slate-700 transition active:scale-90"
+                title="Undo (Cmd+Z)"
+              >
+                <Undo2 className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={onRedo}
+                disabled={!canRedo}
+                className="p-1.5 hover:text-slate-900 hover:bg-white rounded disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-slate-700 transition active:scale-90"
+                title="Redo (Cmd+Shift+Z)"
+              >
+                <Redo2 className="w-3.5 h-3.5" />
+              </button>
             </div>
 
-            <div className="h-4 w-px bg-studio-800 mx-1" />
+            {/* Detected badge */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700">
+              <ScanText className="w-3.5 h-3.5 text-indigo-600" />
+              <span>{blockCount} layers</span>
+            </div>
+
+            {/* AI Vision Badge */}
+            <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-[11px] font-semibold text-emerald-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Vision AI</span>
+            </div>
+
+            <div className="h-4 w-px bg-slate-200 mx-1" />
 
             {/* Zoom Controls */}
-            <div className="flex items-center bg-studio-800 border border-studio-700 rounded-lg p-0.5 text-slate-300">
+            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-lg p-0.5 text-slate-700">
               <button
                 onClick={() => onZoomChange(Math.max(0.2, zoom - 0.1))}
-                className="p-1 hover:text-white rounded hover:bg-studio-700 active:scale-90 transition"
+                className="p-1 hover:text-slate-900 hover:bg-white rounded active:scale-90 transition"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => onZoomChange(1)}
-                className="px-2 text-xs font-mono font-medium hover:text-white"
+                className="px-2 text-xs font-mono font-semibold hover:text-slate-900"
                 title="Reset Zoom to 100%"
               >
                 {Math.round(zoom * 100)}%
               </button>
               <button
                 onClick={() => onZoomChange(Math.min(3, zoom + 0.1))}
-                className="p-1 hover:text-white rounded hover:bg-studio-700 active:scale-90 transition"
+                className="p-1 hover:text-slate-900 hover:bg-white rounded active:scale-90 transition"
                 title="Zoom In"
               >
                 <ZoomIn className="w-3.5 h-3.5" />
@@ -112,16 +150,16 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowSamples(!showSamples)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-studio-800 hover:bg-studio-700 text-xs font-medium text-slate-300 border border-studio-700 transition active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-xs font-medium text-slate-700 border border-slate-200 transition active:scale-95"
           >
-            <ImageIcon className="w-3.5 h-3.5 text-slate-400" />
+            <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
             <span>Samples</span>
           </button>
 
           {showSamples && (
-            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl bg-studio-900 border border-studio-700 shadow-2xl p-2 z-50">
+            <div className="absolute right-0 top-full mt-2 w-72 rounded-xl bg-white border border-slate-200 shadow-xl p-2 z-50 animate-in fade-in zoom-in-95 duration-150">
               <div className="px-2 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                1-Click Preset Samples
+                Instant Presets
               </div>
               <div className="space-y-1 mt-1">
                 {SAMPLE_IMAGES.map((sample) => (
@@ -131,12 +169,12 @@ export const Header: React.FC<HeaderProps> = ({
                       onSampleSelected(sample);
                       setShowSamples(false);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-studio-800 transition flex flex-col gap-0.5 group"
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 transition flex flex-col gap-0.5 group"
                   >
-                    <span className="text-xs font-medium text-slate-200 group-hover:text-indigo-400">
+                    <span className="text-xs font-semibold text-slate-800 group-hover:text-indigo-600">
                       {sample.name}
                     </span>
-                    <span className="text-[11px] text-slate-400 line-clamp-1">
+                    <span className="text-[11px] text-slate-500 line-clamp-1">
                       {sample.description}
                     </span>
                   </button>
@@ -156,20 +194,20 @@ export const Header: React.FC<HeaderProps> = ({
         />
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-studio-800 hover:bg-studio-700 text-xs font-medium text-slate-200 border border-studio-700 transition active:scale-95"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-xs font-medium text-slate-700 border border-slate-200 transition active:scale-95"
         >
-          <Upload className="w-3.5 h-3.5 text-slate-400" />
-          <span>Upload Image</span>
+          <Upload className="w-3.5 h-3.5 text-slate-500" />
+          <span>Upload</span>
         </button>
 
         {/* Export Button */}
         <button
           onClick={onExport}
           disabled={!hasImage}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-semibold text-white shadow-md shadow-indigo-600/30 transition active:scale-95"
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-semibold text-white shadow-md shadow-indigo-600/20 transition active:scale-95"
         >
           <Download className="w-3.5 h-3.5" />
-          <span>Export High-Res</span>
+          <span>Export</span>
         </button>
       </div>
     </header>
