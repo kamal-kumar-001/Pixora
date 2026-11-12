@@ -40,8 +40,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
   isAiProcessing,
 }) => {
   const [aiInput, setAiInput] = React.useState('');
-  const palette = ['#2A0E22', '#54224A', '#F1DCCB', '#FFFFFF', '#54224A', '#EA8A68', '#059669', '#DC2626', '#D97706'];
-  const bgPalette = ['#2A0E22', '#54224A', '#7D4472', '#FFF8F1', '#FFFFFF', '#FBEADB', '#F1DCCB', '#000000'];
+  const palette = ['#0F172A', '#334155', '#E2E8F0', '#FFFFFF', '#4F46E5', '#2563EB', '#059669', '#DC2626', '#D97706'];
+  const bgPalette = ['#12141C', '#1E293B', '#334155', '#F8FAFC', '#FFFFFF', '#F1F5F9', '#E2E8F0', '#000000'];
 
   const handlePickColor = async (target: 'text' | 'bg') => {
     if ('EyeDropper' in window) {
