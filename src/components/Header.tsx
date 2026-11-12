@@ -64,7 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="text-xs text-slate-500 hover:text-slate-900 transition ml-2 border-l border-slate-200 pl-3 flex items-center gap-1 font-medium"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Landing</span>
+          <span className="hidden sm:inline">Landing</span>
         </button>
       </div>
 
@@ -153,7 +153,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-xs font-medium text-slate-700 border border-slate-200 transition active:scale-95"
           >
             <ImageIcon className="w-3.5 h-3.5 text-slate-500" />
-            <span>Samples</span>
+            <span className="hidden sm:inline">Samples</span>
           </button>
 
           {showSamples && (
@@ -197,7 +197,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-xs font-medium text-slate-700 border border-slate-200 transition active:scale-95"
         >
           <Upload className="w-3.5 h-3.5 text-slate-500" />
-          <span>Upload</span>
+          <span className="hidden sm:inline">Upload</span>
         </button>
 
         {/* Export Button */}
