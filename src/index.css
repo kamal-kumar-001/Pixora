@@ -41,3 +41,35 @@
   background-size: 24px 24px;
   background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
 }
+
+/* ---- Landing page ---- */
+.hero-perspective { perspective: 1400px; }
+.hero-stage {
+  --rx: 4deg;
+  --ry: -8deg;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes heroFloat { 0%,100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+.hero-float { animation: heroFloat 6s ease-in-out infinite; }
+@keyframes heroRise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+.hero-rise { opacity: 0; animation: heroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.8s cubic-bezier(0.22,1,0.36,1), transform 0.8s cubic-bezier(0.22,1,0.36,1); }
+.reveal-in { opacity: 1; transform: none; }
+.lift-card, .lift-card-dark { transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s; }
+.lift-card:hover, .lift-card-dark:hover { transform: translateY(-6px); }
+.btn-plum { transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s, background-color 0.25s; box-shadow: 0 10px 24px -12px rgba(59,18,48,0.7); }
+.btn-plum:hover { transform: translateY(-2px); background-color: #54224a; box-shadow: 0 16px 30px -12px rgba(59,18,48,0.75); }
+.btn-plum:active { transform: scale(0.98); }
+.nav-link { position: relative; }
+.nav-link::after { content: ''; position: absolute; left: 0; bottom: -4px; height: 2px; width: 100%; background: #ea8a68; transform: scaleX(0); transform-origin: left; transition: transform 0.3s cubic-bezier(0.22,1,0.36,1); }
+.nav-link:hover::after { transform: scaleX(1); }
+.faq-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s cubic-bezier(0.22,1,0.36,1); }
+.faq-panel.faq-open { grid-template-rows: 1fr; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-float, .hero-rise, .reveal { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
+  .hero-stage { transition: none; }
+  .faq-panel { transition: none; }
+}
