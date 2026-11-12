@@ -45,8 +45,8 @@
 /* ---- Landing page ---- */
 .hero-perspective { perspective: 1400px; }
 .hero-stage {
-  --rx: 4deg;
-  --ry: -8deg;
+  --rx: 5deg;
+  --ry: -14deg;
   transform: rotateX(var(--rx)) rotateY(var(--ry));
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }

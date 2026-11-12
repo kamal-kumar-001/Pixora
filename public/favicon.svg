@@ -1,27 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <defs>
-    <linearGradient id="pixora-grad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#4F46E5"/>
-      <stop offset="50%" stop-color="#7C3AED"/>
-      <stop offset="100%" stop-color="#06B6D4"/>
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
-  </defs>
-  <!-- Background Rounded Shield -->
-  <rect width="64" height="64" rx="16" fill="#0F172A"/>
-  
-  <!-- Outer glowing prism frame -->
-  <path d="M18 16H38C45.732 16 52 22.268 52 30C52 37.732 45.732 44 38 44H26V48H18V16Z" fill="url(#pixora-grad)" opacity="0.15"/>
-  
-  <!-- Main P & typography focal points -->
-  <path d="M22 18H36C42.6274 18 48 23.3726 48 30C48 36.6274 42.6274 42 36 42H28V46H22V18Z" stroke="url(#pixora-grad)" stroke-width="4" stroke-linejoin="round"/>
-  <rect x="22" y="18" width="6" height="28" rx="3" fill="url(#pixora-grad)"/>
-  
-  <!-- Crosshair Focus Points (representing pixel editing precision) -->
-  <circle cx="36" cy="30" r="4" fill="#06B6D4"/>
-  <circle cx="48" cy="18" r="2" fill="#818CF8"/>
-  <circle cx="22" cy="46" r="2" fill="#C084FC"/>
+  <rect width="64" height="64" rx="16" fill="#FFF1E6"/>
+  <rect x="1.5" y="1.5" width="61" height="61" rx="14.5" stroke="#F4A584" stroke-width="3"/>
+  <path d="M21 16H35C42.18 16 48 21.82 48 29C48 36.18 42.18 42 35 42H29V49H21V16Z" fill="#3B1230"/>
+  <circle cx="34.5" cy="29" r="5" fill="#FFF1E6"/>
+  <circle cx="47" cy="17" r="3.2" fill="#EA8A68"/>
 </svg>
