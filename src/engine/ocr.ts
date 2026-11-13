@@ -1,6 +1,7 @@
 import { createWorker, Line } from 'tesseract.js';
 import { TextBlock, ProcessingProgress } from '../types/editor';
 import { detectTextStyle } from './styleDetector';
+import { calculateExactFontSizeAndMetrics } from './fonts';
 
 /**
  * Normalizes common OCR artifacts in digital UI and receipts:
@@ -104,6 +105,7 @@ export async function runOcrAndExtractStyles(
 
     // Analyze pixel colors and typography style
     const style = detectTextStyle(ctx, bbox, rawClean);
+    const metrics = calculateExactFontSizeAndMetrics(rawClean, style.suggestedFontFamily, style.fontWeight, width, height);
 
     blocks.push({
       id: `text-block-${Date.now()}-${index}`,
@@ -111,25 +113,27 @@ export async function runOcrAndExtractStyles(
       originalText: rawClean,
       x: bbox.x0,
       y: bbox.y0,
-      width: Math.max(width, 30),
-      height: Math.max(height, 16),
+      width: Math.max(width, metrics.width),
+      height: Math.max(height, metrics.height),
       originalX: bbox.x0,
       originalY: bbox.y0,
-      originalWidth: Math.max(width, 30),
-      originalHeight: Math.max(height, 16),
+      originalWidth: Math.max(width, metrics.width),
+      originalHeight: Math.max(height, metrics.height),
       patchPaddingX: 6,
       patchPaddingY: 4,
       showBackgroundPatch: true,
-      fontSize: style.fontSize,
+      fontSize: metrics.fontSize,
       fontFamily: style.suggestedFontFamily,
       fontWeight: style.fontWeight,
       fontStyle: style.fontStyle,
       color: style.textColor,
       backgroundColor: style.backgroundColor,
       textAlign: 'left',
-      letterSpacing: 0,
-      lineHeight: 1.15,
+      letterSpacing: metrics.letterSpacing,
+      lineHeight: 1,
       opacity: 1,
+      blur: 0.2,
+      degradation: 12,
       confidence: Math.round(line.confidence),
       isModified: false,
       isDeleted: false,

@@ -77,6 +77,30 @@ export async function exportEditedImage(
     });
 
     ctx.restore();
+
+    // Apply authentic pixel degradation / grain to match original compressed image texture
+    if (block.degradation && block.degradation > 0) {
+      const boxX = Math.max(0, Math.floor(block.x - 2));
+      const boxY = Math.max(0, Math.floor(block.y - 2));
+      const boxW = Math.min(canvas.width - boxX, Math.ceil(block.width + 4));
+      const boxH = Math.min(canvas.height - boxY, Math.ceil(block.height + 4));
+
+      if (boxW > 0 && boxH > 0) {
+        const patchData = ctx.getImageData(boxX, boxY, boxW, boxH);
+        const data = patchData.data;
+        const noiseFactor = (block.degradation / 100) * 36;
+
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] > 20) {
+            const noise = (Math.random() - 0.5) * noiseFactor;
+            data[i] = Math.min(255, Math.max(0, data[i] + noise));
+            data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise));
+            data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise));
+          }
+        }
+        ctx.putImageData(patchData, boxX, boxY);
+      }
+    }
   }
 
   // 3. Trigger download

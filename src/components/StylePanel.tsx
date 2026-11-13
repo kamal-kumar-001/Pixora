@@ -490,6 +490,119 @@ export const StylePanel: React.FC<StylePanelProps> = ({
             )}
           </div>
 
+          {/* Texture Realism & Edge Softness / Degradation */}
+          <div className="pt-3 border-t border-slate-100 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Realism & Texture Match</span>
+              </label>
+              <span className="text-[10px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200/60 px-1.5 py-0.5 rounded">
+                Anti-Fake
+              </span>
+            </div>
+
+            {/* 1. Optical Softness / Blur Slider with exact numeric input */}
+            <div>
+              <div className="flex items-center justify-between text-[11px] text-slate-600 mb-1">
+                <span className="font-medium">Optical Softness / Blur</span>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    min={0}
+                    max={6}
+                    step={0.1}
+                    value={selectedBlock.blur ?? 0}
+                    onChange={(e) => updateBlock({ blur: Math.max(0, Math.min(6, parseFloat(e.target.value) || 0)) })}
+                    className="w-12 bg-slate-50 border border-slate-200 rounded px-1 py-0.5 text-[11px] font-mono text-right text-indigo-700 font-bold focus:outline-none focus:border-indigo-500 shadow-2xs"
+                  />
+                  <span className="text-[11px] text-slate-400">px</span>
+                </div>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={5}
+                step={0.1}
+                value={selectedBlock.blur ?? 0}
+                onChange={(e) => updateBlock({ blur: parseFloat(e.target.value) })}
+                className="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded cursor-pointer"
+              />
+              {/* Blur Presets */}
+              <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                {[
+                  { label: "0px Crisp", val: 0 },
+                  { label: "0.3px Subtle", val: 0.3 },
+                  { label: "0.8px Soft", val: 0.8 },
+                  { label: "1.8px Defocused", val: 1.8 }
+                ].map((p) => (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => updateBlock({ blur: p.val })}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-medium border transition ${
+                      (selectedBlock.blur ?? 0) === p.val
+                        ? "bg-indigo-50 text-indigo-700 border-indigo-300 font-semibold"
+                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Pixel Degradation & Compression Noise Slider with exact number */}
+            <div>
+              <div className="flex items-center justify-between text-[11px] text-slate-600 mb-1">
+                <span className="font-medium">Pixel Degradation & Grain</span>
+                <div className="flex items-center gap-1">
+                  <input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={selectedBlock.degradation ?? 0}
+                    onChange={(e) => updateBlock({ degradation: Math.max(0, Math.min(100, parseInt(e.target.value, 10) || 0)) })}
+                    className="w-12 bg-slate-50 border border-slate-200 rounded px-1 py-0.5 text-[11px] font-mono text-right text-indigo-700 font-bold focus:outline-none focus:border-indigo-500 shadow-2xs"
+                  />
+                  <span className="text-[11px] text-slate-400">%</span>
+                </div>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={selectedBlock.degradation ?? 0}
+                onChange={(e) => updateBlock({ degradation: parseInt(e.target.value, 10) })}
+                className="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded cursor-pointer"
+              />
+              {/* Degradation Presets */}
+              <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                {[
+                  { label: "0% Clean", val: 0 },
+                  { label: "15% Camera", val: 15 },
+                  { label: "30% Receipt", val: 30 },
+                  { label: "60% Heavy", val: 60 }
+                ].map((p) => (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => updateBlock({ degradation: p.val })}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-medium border transition ${
+                      (selectedBlock.degradation ?? 0) === p.val
+                        ? "bg-indigo-50 text-indigo-700 border-indigo-300 font-semibold"
+                        : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Position & Geometry Dimensions */}
           <div className="pt-3 border-t border-slate-100 space-y-2">
             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 mb-1">

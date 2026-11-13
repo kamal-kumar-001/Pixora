@@ -323,38 +323,72 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
                     minHeight: `${Math.max(block.height, 16)}px`,
                   }}
                 >
-                  {/* Inline textarea when double clicked */}
+                  {/* Inline input/textarea when double clicked: 100% zero-jump seamless typing */}
                   {isEditing ? (
-                    <textarea
-                      autoFocus
-                      value={block.text}
-                      onChange={(e) => {
-                        onUpdateBlock({
-                          ...block,
-                          text: e.target.value,
-                          isModified: true,
-                        });
-                      }}
-                      onBlur={() => setEditingBlockId(null)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Escape') setEditingBlockId(null);
-                      }}
-                      className="relative z-20 w-full h-full bg-white border border-indigo-600 rounded px-1 text-slate-900 focus:outline-none resize-none leading-none shadow-md"
-                      style={{
-                        fontFamily: `"${block.fontFamily}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`,
-                        fontSize: `${block.fontSize}px`,
-                        fontWeight: block.fontWeight,
-                        fontStyle: block.fontStyle,
-                        color: block.color,
-                        textAlign: block.textAlign,
-                        letterSpacing: `${block.letterSpacing}px`,
-                        lineHeight: block.lineHeight,
-                      }}
-                    />
+                    block.text.includes("\n") ? (
+                      <textarea
+                        autoFocus
+                        value={block.text}
+                        onChange={(e) => {
+                          onUpdateBlock({
+                            ...block,
+                            text: e.target.value,
+                            isModified: true,
+                          });
+                        }}
+                        onBlur={() => setEditingBlockId(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape") setEditingBlockId(null);
+                        }}
+                        className="relative z-20 w-full bg-transparent border-0 outline-none p-0 m-0 focus:ring-0 resize-none overflow-hidden"
+                        style={{
+                          fontFamily: `"${block.fontFamily}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`,
+                          fontSize: `${block.fontSize}px`,
+                          fontWeight: block.fontWeight,
+                          fontStyle: block.fontStyle,
+                          color: block.color,
+                          textAlign: block.textAlign,
+                          letterSpacing: `${block.letterSpacing}px`,
+                          lineHeight: 1,
+                          filter: block.blur > 0 ? `blur(${block.blur}px)` : "none",
+                        }}
+                      />
+                    ) : (
+                      <input
+                        autoFocus
+                        type="text"
+                        value={block.text}
+                        onChange={(e) => {
+                          onUpdateBlock({
+                            ...block,
+                            text: e.target.value,
+                            isModified: true,
+                          });
+                        }}
+                        onBlur={() => setEditingBlockId(null)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape" || e.key === "Enter") setEditingBlockId(null);
+                        }}
+                        className="relative z-20 bg-transparent border-0 outline-none p-0 m-0 focus:ring-0"
+                        style={{
+                          fontFamily: `"${block.fontFamily}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`,
+                          fontSize: `${block.fontSize}px`,
+                          fontWeight: block.fontWeight,
+                          fontStyle: block.fontStyle,
+                          color: block.color,
+                          textAlign: block.textAlign,
+                          letterSpacing: `${block.letterSpacing}px`,
+                          lineHeight: 1,
+                          filter: block.blur > 0 ? `blur(${block.blur}px)` : "none",
+                          minWidth: `${Math.max(block.width, 30)}px`,
+                          width: "100%",
+                        }}
+                      />
+                    )
                   ) : shouldRenderText ? (
-                    /* Modified or selected text: rendered cleanly */
+                    /* Modified or selected text: rendered with realistic blur, degradation & exact typography */
                     <div
-                      className="relative z-20 w-full h-full whitespace-pre-wrap pointer-events-none leading-none select-none"
+                      className="relative z-20 w-full whitespace-pre pointer-events-none select-none"
                       style={{
                         fontFamily: `"${block.fontFamily}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`,
                         fontSize: `${block.fontSize}px`,
@@ -363,8 +397,10 @@ export const CanvasArea: React.FC<CanvasAreaProps> = ({
                         color: block.color,
                         textAlign: block.textAlign,
                         letterSpacing: `${block.letterSpacing}px`,
-                        lineHeight: block.lineHeight,
+                        lineHeight: 1,
                         opacity: block.opacity,
+                        filter: `${block.blur > 0 ? `blur(${block.blur}px)` : ""}${block.degradation > 0 ? ` contrast(${100 - block.degradation * 0.22}%)` : ""}`.trim() || "none",
+                        textShadow: block.degradation > 15 ? `0 0 1px rgba(0,0,0,${Math.min(0.4, (block.degradation / 100) * 0.4)})` : undefined,
                       }}
                     >
                       {block.text || <span className="opacity-0">.</span>}

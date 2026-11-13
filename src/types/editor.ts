@@ -30,6 +30,8 @@ export interface TextBlock {
   letterSpacing: number; // in px
   lineHeight: number; // multiplier e.g. 1.2
   opacity: number;
+  blur: number; // in px e.g. 0 to 5px for matching camera softness
+  degradation: number; // percentage 0 to 100% for grain, noise and compression artifact matching
   confidence: number;
   isModified: boolean;
   isDeleted?: boolean;
