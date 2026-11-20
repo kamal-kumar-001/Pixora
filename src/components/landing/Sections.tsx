@@ -1,3 +1,4 @@
+import { StudioLink } from './StudioLink';
 import React, { useRef, useState } from 'react';
 import { ArrowRight, ScanText, SlidersHorizontal, Download, Upload, MousePointerClick, Plus } from 'lucide-react';
 import { Reveal } from './useReveal';
@@ -215,13 +216,13 @@ export const FinalCta: React.FC<{ onOpen: () => void }> = ({ onOpen }) => (
     <Reveal className="max-w-5xl mx-auto rounded-[36px] bg-gradient-to-br from-peach-300 via-peach-400 to-peach-500 p-10 md:p-16 text-center shadow-[0_40px_80px_-40px_rgba(234,138,104,0.9)]">
       <h2 className="font-display text-4xl md:text-5xl font-bold text-plum-950 text-balance">Ready to change a word?</h2>
       <p className="mt-4 text-lg text-plum-900/80">Open the studio, add an image and edit the text where it sits.</p>
-      <button
-        onClick={onOpen}
+      <StudioLink
+        onOpen={onOpen}
         className="btn-plum group mt-8 inline-flex items-center gap-2 rounded-full bg-plum-900 px-7 py-3.5 text-base font-bold text-cream-100"
       >
         Open Pixora studio
         <ArrowRight className="w-4 h-4 transition-transform duration-300 ease-landing group-hover:translate-x-1" />
-      </button>
+      </StudioLink>
     </Reveal>
   </section>
 );

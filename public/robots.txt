@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /edit
+
+Sitemap: https://pixoraai.vercel.app/sitemap.xml

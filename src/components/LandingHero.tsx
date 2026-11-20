@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import { StudioLink } from './landing/StudioLink';
 import { HeroStage } from './landing/HeroStage';
 import { Features, HowItWorks, Compare, Faq, FinalCta } from './landing/Sections';
 
@@ -25,9 +26,9 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigateToEditor }) 
           <a href="#example" className="nav-link">Example</a>
           <a href="#faq" className="nav-link">FAQ</a>
         </div>
-        <button onClick={onNavigateToEditor} className="btn-plum rounded-full bg-plum-900 px-5 py-2 text-sm font-bold text-cream-100">
+        <StudioLink onOpen={onNavigateToEditor} className="btn-plum rounded-full bg-plum-900 px-5 py-2 text-sm font-bold text-cream-100">
           Open studio
-        </button>
+        </StudioLink>
       </nav>
     </header>
 
@@ -47,13 +48,13 @@ export const LandingHero: React.FC<LandingHeroProps> = ({ onNavigateToEditor }) 
               Detect text in your image and edit it in place.
             </p>
             <div className="hero-rise mt-9 flex flex-wrap items-center gap-4" style={{ animationDelay: '500ms' }}>
-              <button
-                onClick={onNavigateToEditor}
+              <StudioLink
+                onOpen={onNavigateToEditor}
                 className="btn-plum group inline-flex items-center gap-2 rounded-full bg-plum-900 px-7 py-3.5 text-base font-bold text-cream-100"
               >
                 Open Pixora studio
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 ease-landing group-hover:translate-x-1" />
-              </button>
+              </StudioLink>
               <a href="#how-it-works" className="rounded-full px-5 py-3.5 text-base font-bold text-plum-900 ring-1 ring-plum-900/20 hover:bg-white transition-colors">
                 See how it works
               </a>
